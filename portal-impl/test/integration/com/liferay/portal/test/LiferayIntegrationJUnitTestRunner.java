@@ -14,6 +14,8 @@
 
 package com.liferay.portal.test;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.AbstractIntegrationJUnitTestRunner;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.test.jdbc.ResetDatabaseUtilDataSource;
@@ -21,6 +23,8 @@ import com.liferay.portal.util.InitUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import java.util.List;
 
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
@@ -45,6 +49,14 @@ public class LiferayIntegrationJUnitTestRunner
 		System.setProperty("catalina.base", ".");
 
 		ResetDatabaseUtilDataSource.initialize();
+
+		List<String> modules =
+			ModulesTestConfiguratorUtil.getModules(
+				getTestClass().getJavaClass());
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Modules: " + modules);
+		}
 
 		InitUtil.initWithSpringAndModuleFramework();
 	}
@@ -108,5 +120,8 @@ public class LiferayIntegrationJUnitTestRunner
 			throw new ExceptionInInitializerError(e);
 		}
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		LiferayIntegrationJUnitTestRunner.class);
 
 }
