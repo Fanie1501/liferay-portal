@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -154,7 +155,7 @@ public class BackgroundTaskPersistenceTest {
 
 		newBackgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
 
-		newBackgroundTask.setTaskContext(RandomTestUtil.randomString());
+		newBackgroundTask.setTaskContext(new HashMap());
 
 		newBackgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
@@ -667,7 +668,7 @@ public class BackgroundTaskPersistenceTest {
 
 		backgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
 
-		backgroundTask.setTaskContext(RandomTestUtil.randomString());
+		backgroundTask.setTaskContext(new HashMap());
 
 		backgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
