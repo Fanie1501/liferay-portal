@@ -63,6 +63,12 @@ public class ModelListenerRegistrationUtil {
 	}
 
 	private <T> ModelListener<T>[] _getModelListeners(Class<T> clazz) {
+		List<ModelListener<?>> modelListeners = _getModelListenersList(clazz);
+
+		return modelListeners.toArray(new ModelListener[modelListeners.size()]);
+	}
+
+	private <T> List<ModelListener<?>> _getModelListenersList(Class<T> clazz) {
 		List<ModelListener<?>> modelListeners = _modelListeners.get(clazz);
 
 		if (modelListeners == null) {
@@ -75,9 +81,9 @@ public class ModelListenerRegistrationUtil {
 				modelListeners = previousList;
 			}
 		}
-
-		return modelListeners.toArray(new ModelListener[modelListeners.size()]);
+		return modelListeners;
 	}
+
 
 	private <T> void _register(
 		String className, ModelListener<T> modelListener) {
@@ -128,18 +134,8 @@ public class ModelListenerRegistrationUtil {
 				return null;
 			}
 
-			List<ModelListener<?>> modelListeners = _modelListeners.get(clazz);
-
-			if (modelListeners == null) {
-				modelListeners = new ArrayList<ModelListener<?>>();
-
-				List<ModelListener<?>> previousModelListeners =
-					_modelListeners.putIfAbsent(clazz, modelListeners);
-
-				if (previousModelListeners != null) {
-					modelListeners = previousModelListeners;
-				}
-			}
+			List<ModelListener<?>> modelListeners =
+				_getModelListenersList(clazz);
 
 			modelListeners.add(modelListener);
 
