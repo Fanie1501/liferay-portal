@@ -170,6 +170,10 @@ public class JournalTestUtil {
 		int displayDateHour = displayCal.get(Calendar.HOUR);
 		int displayDateMinute = displayCal.get(Calendar.MINUTE);
 
+		if (displayCal.get(Calendar.AM_PM) == Calendar.PM) {
+			displayDateHour += 12;
+		}
+
 		if (workflowEnabled) {
 			serviceContext = (ServiceContext)serviceContext.clone();
 
