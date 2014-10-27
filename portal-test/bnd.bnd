@@ -1,5 +1,12 @@
 Bundle-Version: 6.2.0
 Export-Package:\
+	com.liferay.portal.util.test
+Import-Package:\
+	!org.junit.internal,\
+	!org.junit.runner.manipulation,\
+	!org.junit.runner.notification,\
+	!org.junit.runners,\
+	!org.junit.runners.model,\
 	*
 Include-Resource:\
 	classes,\

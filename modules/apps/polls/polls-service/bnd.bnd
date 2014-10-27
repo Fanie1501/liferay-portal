@@ -3,7 +3,8 @@ Bundle-SymbolicName: com.liferay.polls.service
 Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.polls.lar,\
-	com.liferay.polls.service.configuration.configurator
+	com.liferay.polls.service.configuration.configurator,\
+	com.liferay.polls.model.impl
 Include-Resource: classes
 Liferay-Service: true
 Require-Capability:\
