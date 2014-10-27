@@ -315,6 +315,7 @@ public class ServiceBuilder {
 				"\t-Dservice.tpl.persistence=" + _TPL_ROOT + "persistence.ftl\n"+
 				"\t-Dservice.tpl.persistence_impl=" + _TPL_ROOT + "persistence_impl.ftl\n"+
 				"\t-Dservice.tpl.persistence_util=" + _TPL_ROOT + "persistence_util.ftl\n"+
+				"\t-Dservice.tpl.persistence_util=" + _TPL_ROOT + "persistence_util_activator.ftl\n"+
 				"\t-Dservice.tpl.props=" + _TPL_ROOT + "props.ftl\n"+
 				"\t-Dservice.tpl.remoting_xml=" + _TPL_ROOT + "remoting_xml.ftl\n"+
 				"\t-Dservice.tpl.service=" + _TPL_ROOT + "service.ftl\n"+
@@ -578,6 +579,7 @@ public class ServiceBuilder {
 			"service_props_util", _tplServicePropsUtil);
 		_tplServiceSoap = _getTplProperty("service_soap", _tplServiceSoap);
 		_tplServiceUtil = _getTplProperty("service_util", _tplServiceUtil);
+		_tplServiceUtilActivator = _getTplProperty("service_util", _tplServiceUtilActivator);
 		_tplServiceWrapper = _getTplProperty(
 			"service_wrapper", _tplServiceWrapper);
 		_tplSpringXml = _getTplProperty("spring_xml", _tplSpringXml);
@@ -753,6 +755,10 @@ public class ServiceBuilder {
 							_createPersistence(entity);
 							_createPersistenceUtil(entity);
 
+							if(osgiModule) {
+								_createPersistenceUtilActivator(entity);
+							}
+
 							if (Validator.isNotNull(_testDir)) {
 								_createPersistenceTest(entity);
 							}
@@ -793,6 +799,10 @@ public class ServiceBuilder {
 							_createServiceFactory(entity, _SESSION_TYPE_LOCAL);
 							_createServiceUtil(entity, _SESSION_TYPE_LOCAL);
 
+							if(osgiModule) {
+								_createServiceUtilActivator(entity, _SESSION_TYPE_LOCAL);
+							}
+
 							_createServiceClp(entity, _SESSION_TYPE_LOCAL);
 							_createServiceClpInvoker(
 								entity, _SESSION_TYPE_LOCAL);
@@ -803,6 +813,11 @@ public class ServiceBuilder {
 							_removeServiceBaseImpl(entity, _SESSION_TYPE_LOCAL);
 							_removeService(entity, _SESSION_TYPE_LOCAL);
 							_removeServiceUtil(entity, _SESSION_TYPE_LOCAL);
+
+							if(osgiModule) {
+								_removeServiceUtilActivator(
+									entity, _SESSION_TYPE_LOCAL);
+							}
 
 							_removeServiceClp(entity, _SESSION_TYPE_LOCAL);
 							_removeServiceClpInvoker(
@@ -817,6 +832,10 @@ public class ServiceBuilder {
 							_createService(entity, _SESSION_TYPE_REMOTE);
 							_createServiceFactory(entity, _SESSION_TYPE_REMOTE);
 							_createServiceUtil(entity, _SESSION_TYPE_REMOTE);
+
+							if(osgiModule) {
+								_createServiceUtilActivator(entity, _SESSION_TYPE_REMOTE);
+							}
 
 							_createServiceClp(entity, _SESSION_TYPE_REMOTE);
 							_createServiceClpInvoker(
@@ -841,6 +860,11 @@ public class ServiceBuilder {
 							_removeService(entity, _SESSION_TYPE_REMOTE);
 							_removeServiceUtil(entity, _SESSION_TYPE_REMOTE);
 
+							if(osgiModule) {
+								_removeServiceUtilActivator(
+									entity, _SESSION_TYPE_LOCAL);
+							}
+
 							_removeServiceClp(entity, _SESSION_TYPE_REMOTE);
 							_removeServiceClpInvoker(
 								entity, _SESSION_TYPE_REMOTE);
@@ -860,6 +884,10 @@ public class ServiceBuilder {
 								_getTransients(entity, true));
 						}
 					}
+				}
+
+				if(osgiModule) {
+					_createBundleActivator();
 				}
 
 				_createHbmXml();
@@ -2395,6 +2423,23 @@ public class ServiceBuilder {
 		writeFile(modelFile, content, _author);
 	}
 
+
+	private void _createBundleActivator()throws  Exception {
+
+		Map<String, Object> context = _getContext();
+
+		context.put("entities", _ejbList);
+
+		String content = _processTemplate(_tplBundleActivator, context);
+
+		// Write file
+
+		File modelFile = new File(
+			_serviceOutputPath + "/UtilActivator.java");
+
+		writeFile(modelFile, content, _author);
+	}
+
 	private void _createModelHintsXml() throws Exception {
 		Map<String, Object> context = _getContext();
 
@@ -2587,7 +2632,7 @@ public class ServiceBuilder {
 		// Write file
 
 		File ejbFile = new File(
-			_testOutputPath + "/service/persistence/" + entity.getName() +
+			_testOutputPath + "/service/persistence/test/" + entity.getName() +
 				"PersistenceTest.java");
 
 		writeFile(ejbFile, content, _author);
@@ -2612,6 +2657,29 @@ public class ServiceBuilder {
 		File ejbFile = new File(
 			_serviceOutputPath + "/service/persistence/" + entity.getName() +
 				"Util.java");
+
+		writeFile(ejbFile, content, _author);
+	}
+
+	private void _createPersistenceUtilActivator(Entity entity) throws Exception {
+		JavaClass javaClass = _getJavaClass(
+			_outputPath + "/service/persistence/impl/" + entity.getName() +
+				"PersistenceImpl.java");
+
+		Map<String, Object> context = _getContext();
+
+		context.put("entity", entity);
+		context.put("methods", _getMethods(javaClass));
+
+		// Content
+
+		String content = _processTemplate(_tplPersistenceUtilActivator, context);
+
+		// Write file
+
+		File ejbFile = new File(
+			_serviceOutputPath + "/service/persistence/" + entity.getName() +
+				"UtilActivator.java");
 
 		writeFile(ejbFile, content, _author);
 	}
@@ -3159,6 +3227,31 @@ public class ServiceBuilder {
 		File ejbFile = new File(
 			_serviceOutputPath + "/service/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceUtil.java");
+
+		writeFile(ejbFile, content, _author);
+	}
+
+	private void _createServiceUtilActivator(Entity entity, int sessionType)
+		throws Exception {
+
+		JavaClass javaClass = _getJavaClass(
+			_serviceOutputPath + "/service/" + entity.getName() +
+				_getSessionTypeName(sessionType) + "ServiceActivator.java");
+
+		Map<String, Object> context = _getContext();
+
+		context.put("entity", entity);
+		context.put("sessionTypeName", _getSessionTypeName(sessionType));
+
+		// Content
+
+		String content = _processTemplate(_tplServiceUtilActivator, context);
+
+		// Write file
+
+		File ejbFile = new File(
+			_serviceOutputPath + "/service/" + entity.getName() +
+				_getSessionTypeName(sessionType) + "ServiceUtilActivator.java");
 
 		writeFile(ejbFile, content, _author);
 	}
@@ -5110,6 +5203,12 @@ public class ServiceBuilder {
 				_getSessionTypeName(sessionType) + "ServiceUtil.java");
 	}
 
+	private void _removeServiceUtilActivator(Entity entity, int sessionType) {
+		FileUtil.delete(
+			_serviceOutputPath + "/service/" + entity.getName() +
+				_getSessionTypeName(sessionType) + "ServiceUtilActivator.java");
+	}
+
 	private void _removeServiceWrapper(Entity entity, int sessionType) {
 		FileUtil.delete(
 			_serviceOutputPath + "/service/" + entity.getName() +
@@ -5211,6 +5310,7 @@ public class ServiceBuilder {
 	private String _tplBadColumnNames = _TPL_ROOT + "bad_column_names.txt";
 	private String _tplBadTableNames = _TPL_ROOT + "bad_table_names.txt";
 	private String _tplBlobModel = _TPL_ROOT + "blob_model.ftl";
+	private String _tplBundleActivator = _TPL_ROOT + "bundle_activator.ftl";
 	private String _tplEjbPk = _TPL_ROOT + "ejb_pk.ftl";
 	private String _tplException = _TPL_ROOT + "exception.ftl";
 	private String _tplExportActionableDynamicQuery =
@@ -5236,6 +5336,8 @@ public class ServiceBuilder {
 	private String _tplPersistenceImpl = _TPL_ROOT + "persistence_impl.ftl";
 	private String _tplPersistenceTest = _TPL_ROOT + "persistence_test.ftl";
 	private String _tplPersistenceUtil = _TPL_ROOT + "persistence_util.ftl";
+	private String _tplPersistenceUtilActivator = _TPL_ROOT + "persistence_util_activator.ftl";
+
 	private String _tplProps = _TPL_ROOT + "props.ftl";
 	private String _tplRemotingXml = _TPL_ROOT + "remoting_xml.ftl";
 	private String _tplService = _TPL_ROOT + "service.ftl";
@@ -5252,6 +5354,7 @@ public class ServiceBuilder {
 	private String _tplServicePropsUtil = _TPL_ROOT + "service_props_util.ftl";
 	private String _tplServiceSoap = _TPL_ROOT + "service_soap.ftl";
 	private String _tplServiceUtil = _TPL_ROOT + "service_util.ftl";
+	private String _tplServiceUtilActivator = _TPL_ROOT + "service_util_activator.ftl";
 	private String _tplServiceWrapper = _TPL_ROOT + "service_wrapper.ftl";
 	private String _tplSpringXml = _TPL_ROOT + "spring_xml.ftl";
 
