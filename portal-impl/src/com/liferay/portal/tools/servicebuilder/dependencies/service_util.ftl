@@ -127,7 +127,7 @@ public class ${entity.name}${sessionTypeName}ServiceUtil {
 
 	public static ${entity.name}${sessionTypeName}Service getService() {
 		<#if osgiModule>
-			return _serviceTracker.getService();
+			return _service;
 		<#else>
 			if (_service == null) {
 				<#if pluginName != "">
@@ -150,25 +150,11 @@ public class ${entity.name}${sessionTypeName}ServiceUtil {
 		</#if>
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(${entity.name}${sessionTypeName}Service service) {
+	static void setService(${entity.name}${sessionTypeName}Service service) {
+		_service = service;
 	}
 
-	<#if osgiModule>
-		private static ServiceTracker<${entity.name}${sessionTypeName}Service, ${entity.name}${sessionTypeName}Service> _serviceTracker;
 
-		static {
-			Bundle bundle = FrameworkUtil.getBundle(${entity.name}${sessionTypeName}ServiceUtil.class);
-
-			_serviceTracker = new ServiceTracker<${entity.name}${sessionTypeName}Service, ${entity.name}${sessionTypeName}Service>(bundle.getBundleContext(), ${entity.name}${sessionTypeName}Service.class, null);
-
-			_serviceTracker.open();
-		}
-	<#else>
-		private static ${entity.name}${sessionTypeName}Service _service;
-	</#if>
+	private static ${entity.name}${sessionTypeName}Service _service;
 
 }
