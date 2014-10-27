@@ -149,7 +149,7 @@ public class ${entity.name}Util {
 
 	public static ${entity.name}Persistence getPersistence() {
 		<#if osgiModule>
-			return _serviceTracker.getService();
+			return _persistence;
 		<#else>
 			if (_persistence == null) {
 				<#if pluginName != "">
@@ -165,25 +165,10 @@ public class ${entity.name}Util {
 		</#if>
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setPersistence(${entity.name}Persistence persistence) {
+	static void setPersistence(${entity.name}Persistence persistence) {
+		_persistence = persistence;
 	}
 
-	<#if osgiModule>
-		private static ServiceTracker<${entity.name}Persistence, ${entity.name}Persistence> _serviceTracker;
-
-		static {
-			Bundle bundle = FrameworkUtil.getBundle(${entity.name}Util.class);
-
-			_serviceTracker = new ServiceTracker<${entity.name}Persistence, ${entity.name}Persistence>(bundle.getBundleContext(), ${entity.name}Persistence.class, null);
-
-			_serviceTracker.open();
-		}
-	<#else>
-		private static ${entity.name}Persistence _persistence;
-	</#if>
+	private static ${entity.name}Persistence _persistence;
 
 }

@@ -12,7 +12,7 @@
 	<#assign parentPKColumn = entity.getColumn("parent" + pkColumn.methodName)>
 </#if>
 
-package ${packagePath}.service.persistence;
+package ${packagePath}.service.persistence.test;
 
 <#assign noSuchEntity = serviceBuilder.getNoSuchEntityException(entity)>
 
@@ -82,9 +82,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
-* @generated
+* @generated HOLA
 */
+
+
+<#if !osgiModule>
 @DatabaseBuilder
+</#if>
 @RunWith(Arquillian.class)
 @Transactional(propagation = Propagation.REQUIRED)
 public class ${entity.name}PersistenceTest {
