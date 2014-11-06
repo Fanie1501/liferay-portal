@@ -19,14 +19,15 @@ import com.liferay.arquillian.transactional.extension.observer.TransactionalObse
 import com.liferay.arquillian.transactional.extension.util.TransactionalUtil;
 import org.jboss.arquillian.container.test.spi.RemoteLoadableExtension;
 import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
+import org.jboss.osgi.metadata.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Date;
+import java.util.jar.Manifest;
 
 /**
  * @author Carlos Sierra Andrés
@@ -39,40 +40,46 @@ public class TransactionalLiferayAuxiliaryAppender implements AuxiliaryArchiveAp
 		JavaArchive archive = ShrinkWrap.create(
 			JavaArchive.class, "arquillian-liferay-transactional.jar");
 
-		File file = new File("/tmp/MANIFEST.MF");
+		final OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
+
+		builder.addImportPackages(
+			"com.liferay.portal.kernel.util",
+			"com.liferay.portal.test.jdbc" ,
+			"com.liferay.portal.util",
+			"org.jboss.arquillian.core.api",
+			"org.jboss.arquillian.core.api.annotation",
+			"org.jboss.arquillian.core.spi",
+			"org.jboss.arquillian.core.spi.event",
+			"org.jboss.arquillian.test.spi",
+			"org.jboss.arquillian.test.spi.event.suite");
+
+		builder.addBundleManifestVersion(1);
+
+		Manifest manifest = builder.getManifest();
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		try {
-			file.createNewFile();
-
-			FileOutputStream fop = new FileOutputStream(file);
-
-			String manifest_text = "Manifest-Version: 1.0\n" +
-				"Bnd-LastModified: " + new Date().getTime() + "\n" +
-				"Bundle-ManifestVersion: 2\n" +
-				"Bundle-Name: Liferay Arquillian Transactional Extension\n" +
-				"Bundle-SymbolicName: com.liferay.arquillian.transactional.extension\n" +
-				"Bundle-Vendor: Liferay, Inc.\n" +
-				"Bundle-Version: 1.0.0\n" +
-				"Import-Package: com.liferay.portal.kernel.util,com.liferay.portal.test.j\n" +
-				" dbc,com.liferay.portal.util,org.jboss.arquillian.core.api,org.jboss.arq\n" +
-				" uillian.core.api.annotation,org.jboss.arquillian.core.spi,org.jboss.arq\n" +
-				" uillian.core.spi.event,org.jboss.arquillian.test.spi,org.jboss.arquilli\n" +
-				" an.test.spi.event.suite\n" +
-				"Include-Resource: classes\n";
-
-			fop.write(manifest_text.getBytes());
-
+			manifest.write(baos);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		archive.addAsManifestResource(file);
+		ByteArrayAsset byteArrayAsset = new ByteArrayAsset(
+			baos.toByteArray());
+
+		archive.add(byteArrayAsset, "/META-INF/MANIFEST.MF");
 
 		archive.addAsServiceProvider(
 			RemoteLoadableExtension.class,
 			TransactionalRemoteExtension.class);
 
-		archive.addPackages(true, TransactionalRemoteExtension.class.getPackage(), TransactionalObserver.class.getPackage(), TransactionalUtil.class.getPackage());
+		archive.addClass(TransactionalRemoteExtension.class);
+
+		archive.addPackages(true,
+			TransactionalRemoteExtension.class.getPackage(),
+			TransactionalObserver.class.getPackage(),
+			TransactionalUtil.class.getPackage());
 
 		return archive;
 	}
