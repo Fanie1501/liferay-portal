@@ -16,11 +16,6 @@ package com.liferay.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * Provides the local service utility for PollsQuestion. This utility wraps
  * {@link com.liferay.polls.service.impl.PollsQuestionLocalServiceImpl} and is the
@@ -420,24 +415,12 @@ public class PollsQuestionLocalServiceUtil {
 	}
 
 	public static PollsQuestionLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(PollsQuestionLocalService service) {
+	static void setService(PollsQuestionLocalService service) {
+		_service = service;
 	}
 
-	private static ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(PollsQuestionLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<PollsQuestionLocalService, PollsQuestionLocalService>(bundle.getBundleContext(),
-				PollsQuestionLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static PollsQuestionLocalService _service;
 }

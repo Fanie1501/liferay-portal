@@ -16,11 +16,6 @@ package com.liferay.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * Provides the local service utility for PollsChoice. This utility wraps
  * {@link com.liferay.polls.service.impl.PollsChoiceLocalServiceImpl} and is the
@@ -352,24 +347,12 @@ public class PollsChoiceLocalServiceUtil {
 	}
 
 	public static PollsChoiceLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(PollsChoiceLocalService service) {
+	static void setService(PollsChoiceLocalService service) {
+		_service = service;
 	}
 
-	private static ServiceTracker<PollsChoiceLocalService, PollsChoiceLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(PollsChoiceLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<PollsChoiceLocalService, PollsChoiceLocalService>(bundle.getBundleContext(),
-				PollsChoiceLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static PollsChoiceLocalService _service;
 }

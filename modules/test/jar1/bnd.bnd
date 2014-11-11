@@ -1,0 +1,6 @@
+Bundle-Activator: activator.BundleActivator
+Bundle-Name: Jar 1
+Bundle-SymbolicName: jar1
+Bundle-Version: 1.0.0
+Export-Package: prueba
+Include-Resource:classes,@${project.dir}/lib/arquillian-core-api.jar,@${project.dir}/lib/arquillian-core-spi.jar

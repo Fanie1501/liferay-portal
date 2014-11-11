@@ -22,11 +22,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.service.ServiceContext;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-
-import org.osgi.util.tracker.ServiceTracker;
-
 import java.util.List;
 
 /**
@@ -822,24 +817,12 @@ public class PollsQuestionUtil {
 	}
 
 	public static PollsQuestionPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setPersistence(PollsQuestionPersistence persistence) {
+	static void setPersistence(PollsQuestionPersistence persistence) {
+		_persistence = persistence;
 	}
 
-	private static ServiceTracker<PollsQuestionPersistence, PollsQuestionPersistence> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(PollsQuestionUtil.class);
-
-		_serviceTracker = new ServiceTracker<PollsQuestionPersistence, PollsQuestionPersistence>(bundle.getBundleContext(),
-				PollsQuestionPersistence.class, null);
-
-		_serviceTracker.open();
-	}
+	private static PollsQuestionPersistence _persistence;
 }
