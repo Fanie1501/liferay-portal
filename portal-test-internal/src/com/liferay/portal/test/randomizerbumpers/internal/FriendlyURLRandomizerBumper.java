@@ -12,12 +12,13 @@
  * details.
  */
 
-package com.liferay.portal.test.randomizerbumpers;
+package com.liferay.portal.test.randomizerbumpers.internal;
 
 import com.liferay.portal.LayoutFriendlyURLException;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.impl.LayoutImpl;
+import com.liferay.portal.test.randomizerbumpers.RandomizerBumper;
 
 /**
  * @author Shuyang Zhou

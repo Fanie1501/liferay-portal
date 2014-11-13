@@ -16,18 +16,18 @@ package com.liferay.arquillian.transactional.extension.observer;
 
 import com.liferay.arquillian.transactional.extension.util.TransactionalUtil;
 import com.liferay.arquillian.transactional.extension.util.TransactionalUtilImpl;
-import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
 import org.jboss.arquillian.core.api.InstanceProducer;
 import org.jboss.arquillian.core.api.annotation.ApplicationScoped;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
+import org.jboss.arquillian.test.spi.event.suite.BeforeClass;
 
 /**
  * @author Cristina González
  */
 public class TransactionUtilProducer {
 
-	public void createTransactionalUtil(@Observes ArquillianDescriptor event) {
+	public void createTransactionalUtil(@Observes BeforeClass event) {
 		_transactionalUtilProducer.set( new TransactionalUtilImpl());
 	}
 

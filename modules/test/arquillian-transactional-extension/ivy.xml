@@ -20,9 +20,9 @@
 		<dependency name="arquillian-container-test-impl-base" org="org.jboss.arquillian.container" rev="1.1.2.Final" />
 		<dependency name="arquillian-container-test-spi" org="org.jboss.arquillian.container" rev="1.1.2.Final" />
 		<dependency name="arquillian-core-impl-base" org="org.jboss.arquillian.core" rev="1.1.2.Final" />
-
-		<dependency name="org.osgi.core" org="org.osgi" rev="5.0.0" />
 		<dependency name="arquillian-test-impl-base" org="org.jboss.arquillian.test" rev="1.1.2.Final" />
 
+		<dependency name="jbosgi-metadata" org="org.jboss.osgi.metadata" rev="4.0.0.CR1" />
+		<dependency name="org.osgi.core" org="org.osgi" rev="5.0.0" />
 	</dependencies>
 </ivy-module>

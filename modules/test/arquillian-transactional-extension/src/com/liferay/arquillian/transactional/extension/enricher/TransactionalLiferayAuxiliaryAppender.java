@@ -51,7 +51,8 @@ public class TransactionalLiferayAuxiliaryAppender implements AuxiliaryArchiveAp
 			"org.jboss.arquillian.core.spi",
 			"org.jboss.arquillian.core.spi.event",
 			"org.jboss.arquillian.test.spi",
-			"org.jboss.arquillian.test.spi.event.suite");
+			"org.jboss.arquillian.test.spi.event.suite",
+			"com.liferay.portal.kernel.exception");
 
 		builder.addBundleManifestVersion(1);
 
