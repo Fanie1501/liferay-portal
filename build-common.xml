@@ -692,6 +692,7 @@ Please set the environment variable ANT_OPTS to the recommended value of
 				<available file="test/@{test.type}" type="dir" />
 				<then>
 					<setup-test-classpath
+						file="${project.dir}/dependencies/ivy-persistence-test.xml"
 						test.type="@{test.type}"
 					/>
 
@@ -1136,13 +1137,10 @@ Please set the environment variable ANT_OPTS to the recommended value of
 
 	<macrodef name="setup-test-classpath">
 		<attribute name="test.type" />
+		<attribute name="file" default="${project.dir}/dependencies/ivy-test.xml" />
 
 		<sequential>
-			<ivy:resolve log="download-only">
-				<dependency name="arquillian-junit-container" org="org.jboss.arquillian.junit" rev="1.1.2.Final" />
-				<dependency name="com.liferay.arquillian.extension" org="com.liferay" rev="1.0.0-SNAPSHOT" />
-				<exclude org="junit" />
-			</ivy:resolve>
+			<ivy:resolve log="download-only" file="@{file}" />
 
 			<path id="test-ivy.classpath">
 				<ivy:resources type="bundle,jar,orbit" />
@@ -1274,7 +1272,7 @@ rerun your task.
 
 	<macrodef name="test-cmd">
 		<attribute name="junit.forkmode" />
-		<attribute name="test.class" />
+		<attribute name="test.includes" />
 		<attribute name="test.type" />
 		<attribute default="" name="test.excludes" />
 
@@ -1289,9 +1287,6 @@ rerun your task.
 				</else>
 			</if>
 
-			<setup-test-classpath
-				test.type="@{test.type}"
-			/>
 
 			<if>
 				<available file="test/${current.test.dir}" type="dir" />
@@ -1299,7 +1294,7 @@ rerun your task.
 					<resourcecount property="test.with.security.count">
 						<fileset
 							dir="test-classes/${current.test.dir}"
-							includes="**/@{test.class}.class"
+							includes="@{test.includes}"
 						>
 							<filename regex=".*/pacl/test/[\w]+Test.class" negate="false" />
 						</fileset>
@@ -1310,6 +1305,10 @@ rerun your task.
 							<equals arg1="${test.with.security.count}" arg2="0" />
 						</not>
 						<then>
+							<setup-test-classpath
+								test.type="@{test.type}"
+							/>
+
 							<junit-cmd
 								forkmode="once"
 								test.type="@{test.type}"
@@ -1322,7 +1321,7 @@ rerun your task.
 								</misc>
 								<test.classes>
 									<batchtest todir="test-results/@{test.type}">
-										<fileset dir="test-classes/${current.test.dir}" includes="**/@{test.class}.class">
+										<fileset dir="test-classes/${current.test.dir}" includes="@{test.includes}">
 											<exclude name="**/DLAppServiceHttpTest.class" />
 											<exclude name="**/DLAppServiceJsonTest.class" />
 											<exclude name="**/DLAppServiceSoapTest.class" />
@@ -1338,20 +1337,70 @@ rerun your task.
 						</then>
 					</if>
 
-					<resourcecount property="test.without.security.count">
+					<resourcecount property="test.with.persistence.count">
 						<fileset
-							dir="test-classes/${current.test.dir}"
-							includes="**/@{test.class}.class"
-						>
-							<filename regex=".*/pacl/test/[\w]+Test.class" negate="true" />
+								dir="test-classes/${current.test.dir}"
+								includes="@{test.includes}"
+								>
+							<filename regex=".*/[\w]+PersistenceTest.class" negate="false" />
 						</fileset>
 					</resourcecount>
 
 					<if>
 						<not>
-							<equals arg1="${test.without.security.count}" arg2="0" />
+							<equals arg1="${test.with.persistence.count}" arg2="0" />
 						</not>
 						<then>
+							<setup-test-classpath
+								file="${project.dir}/dependencies/ivy-persistence-test.xml"
+								test.type="@{test.type}"
+							/>
+
+							<junit-cmd
+									forkmode="@{junit.forkmode}"
+									test.type="@{test.type}"
+									>
+								<misc>
+									<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
+									<jvmarg value="-Dliferay.mode=test" />
+								</misc>
+								<test.classes>
+									<batchtest todir="test-results/@{test.type}">
+										<fileset dir="test-classes/${current.test.dir}" includes="@{test.includes}">
+											<exclude name="**/DLAppServiceHttpTest.class" />
+											<exclude name="**/DLAppServiceJsonTest.class" />
+											<exclude name="**/DLAppServiceSoapTest.class" />
+											<exclude name="**/UserServiceHttpTest.class" />
+											<exclude name="**/UserServiceSoapTest.class" />
+											<exclude name="${test.excludes}" />
+											<filename regex="${junit.test.excludes}" negate="true" />
+											<filename regex=".*/[\w]+PersistenceTest.class" negate="false" />
+										</fileset>
+									</batchtest>
+								</test.classes>
+							</junit-cmd>
+						</then>
+					</if>
+
+					<resourcecount property="test.without.security.or.persistence.count">
+						<fileset
+							dir="test-classes/${current.test.dir}"
+							includes="@{test.includes}"
+						>
+							<filename regex=".*/pacl/test/[\w]+Test.class" negate="true" />
+							<filename regex=".*/[\w]+PersistenceTest.class" negate="true" />
+						</fileset>
+					</resourcecount>
+
+					<if>
+						<not>
+							<equals arg1="${test.without.security.or.persistence.count}" arg2="0" />
+						</not>
+						<then>
+							<setup-test-classpath
+								test.type="@{test.type}"
+							/>
+
 							<junit-cmd
 								forkmode="@{junit.forkmode}"
 								test.type="@{test.type}"
@@ -1362,7 +1411,7 @@ rerun your task.
 								</misc>
 								<test.classes>
 									<batchtest todir="test-results/@{test.type}">
-										<fileset dir="test-classes/${current.test.dir}" includes="**/@{test.class}.class">
+										<fileset dir="test-classes/${current.test.dir}" includes="@{test.includes}">
 											<exclude name="**/DLAppServiceHttpTest.class" />
 											<exclude name="**/DLAppServiceJsonTest.class" />
 											<exclude name="**/DLAppServiceSoapTest.class" />
@@ -1371,6 +1420,7 @@ rerun your task.
 											<exclude name="${test.excludes}" />
 											<filename regex="${junit.test.excludes}" negate="true" />
 											<filename regex=".*/pacl/test/[\w]+Test.class" negate="true" />
+											<filename regex=".*/[\w]+PersistenceTest.class" negate="true" />
 										</fileset>
 									</batchtest>
 								</test.classes>
@@ -1556,7 +1606,7 @@ rerun your task.
 
 		<test-cmd
 			junit.forkmode="perTest"
-			test.class="${test.class}"
+			test.includes="**/${test.class}.class"
 			test.type="${test.type}"
 		/>
 
@@ -1570,14 +1620,7 @@ rerun your task.
 
 		<test-cmd
 			junit.forkmode="once"
-			test.class="*Test"
-			test.excludes="**/*PersistenceTest.class"
-			test.type="integration"
-		/>
-
-		<test-cmd
-			junit.forkmode="once"
-			test.class="*PersistenceTest"
+			test.includes="**/*Test.class"
 			test.type="integration"
 		/>
 
@@ -1663,9 +1706,20 @@ rerun your task.
 			replace="com."
 		/>
 
-		<setup-test-classpath
-			test.type="${test.type}"
-		/>
+		<if>
+			<contains string="${test.class.name}" substring="PersistenceTest" />
+			<then>
+				<setup-test-classpath
+					file="${project.dir}/dependencies/ivy-persistence-test.xml"
+					test.type="${test.type}"
+				/>
+			</then>
+			<else>
+				<setup-test-classpath
+					test.type="${test.type}"
+				/>
+			</else>
+		</if>
 
 		<junit-cmd
 			forkmode="once"
@@ -1698,7 +1752,7 @@ rerun your task.
 		<if>
 			<available file="test/integration" type="dir" />
 			<then>
-				<resourcecount property="test.integration.other.count">
+				<resourcecount property="test.integration.count">
 					<fileset
 						dir="test/integration"
 						excludes="**/${test.package.dir}/*PersistenceTest.java"
@@ -1708,37 +1762,12 @@ rerun your task.
 
 				<if>
 					<not>
-						<equals arg1="${test.integration.other.count}" arg2="0" />
+						<equals arg1="${test.integration.count}" arg2="0" />
 					</not>
 					<then>
 						<test-cmd
 							junit.forkmode="once"
-							test.class="**/${test.package.dir}/*Test"
-							test.excludes="**/*PersistenceTest.class"
-							test.type="integration"
-						/>
-
-						<report-test-coverage
-							test.type="integration"
-						/>
-					</then>
-				</if>
-
-				<resourcecount property="test.integration.persistence.count">
-					<fileset
-						dir="test/integration"
-						includes="**/${test.package.dir}/*PersistenceTest.java"
-					/>
-				</resourcecount>
-
-				<if>
-					<not>
-						<equals arg1="${test.integration.persistence.count}" arg2="0" />
-					</not>
-					<then>
-						<test-cmd
-							junit.forkmode="once"
-							test.class="**/${test.package.dir}/*PersistenceTest"
+							test.includes="**/${test.package.dir}/*Test.class"
 							test.type="integration"
 						/>
 
@@ -1767,7 +1796,7 @@ rerun your task.
 					<then>
 						<test-cmd
 							junit.forkmode="perTest"
-							test.class="**/${test.package.dir}/*Test"
+							test.includes="**/${test.package.dir}/*Test.class"
 							test.type="unit"
 						/>
 
@@ -1810,7 +1839,7 @@ rerun your task.
 
 		<test-cmd
 			junit.forkmode="perTest"
-			test.class="*Test"
+			test.includes="**/*Test.class"
 			test.type="unit"
 		/>
 
