@@ -51,7 +51,7 @@ public class PollsVotePersistenceTest {
 		PollsVote newPollsVote = addPollsVote();
 
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(PollsVote.class,
-			PollsVote.class.getClassLoader());
+			getClass().getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("voteId",
 			newPollsVote.getVoteId()));
@@ -63,6 +63,10 @@ public class PollsVotePersistenceTest {
 		PollsVote existingPollsVote = result.get(0);
 
 		Assert.assertEquals(existingPollsVote, newPollsVote);
+
+		System.out.println();
+
+		Assert.assertTrue(false);
 	}
 
 	protected PollsVote addPollsVote() throws Exception {
