@@ -12,12 +12,14 @@
  * details.
  */
 
-package com.liferay.bookmarks.service.persistence;
+package com.liferay.bookmarks.service.persistence.test;
 
 import com.liferay.bookmarks.exception.NoSuchFolderException;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.impl.BookmarksFolderModelImpl;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
+import com.liferay.bookmarks.service.persistence.BookmarksFolderPersistence;
+import com.liferay.bookmarks.service.persistence.BookmarksFolderUtil;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -46,7 +48,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -65,8 +67,8 @@ import java.util.Set;
  */
 @RunWith(Arquillian.class)
 public class BookmarksFolderPersistenceTest {
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
+	@Rule
+	public TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
 	@BeforeClass
 	public static void setupClass() throws TemplateException {
