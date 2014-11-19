@@ -12,12 +12,14 @@
  * details.
  */
 
-package com.liferay.polls.service.persistence;
+package com.liferay.polls.service.persistence.test;
 
 import com.liferay.polls.exception.NoSuchQuestionException;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.impl.PollsQuestionModelImpl;
 import com.liferay.polls.service.PollsQuestionLocalServiceUtil;
+import com.liferay.polls.service.persistence.PollsQuestionPersistence;
+import com.liferay.polls.service.persistence.PollsQuestionUtil;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -46,7 +48,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -65,8 +67,8 @@ import java.util.Set;
  */
 @RunWith(Arquillian.class)
 public class PollsQuestionPersistenceTest {
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
+	@Rule
+	public TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
 	@BeforeClass
 	public static void setupClass() throws TemplateException {
