@@ -12,61 +12,73 @@
  * details.
  */
 
-package com.liferay.polls.service.persistence.test;
+package test;
 
-import com.liferay.arquillian.container.enricher.Inject;
+import com.liferay.polls.exception.NoSuchVoteException;
 import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.model.impl.PollsVoteModelImpl;
+import com.liferay.polls.service.PollsVoteLocalServiceUtil;
 import com.liferay.polls.service.persistence.PollsVotePersistence;
+import com.liferay.polls.service.persistence.PollsVoteUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.IntegerWrapper;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.liferay.arquillian.container.enricher.Inject;
 
 /**
-* @generated HOLA
-*/
+ * @generated
+ */
 @RunWith(Arquillian.class)
 @Transactional(propagation = Propagation.REQUIRED)
 public class PollsVotePersistenceTest {
+	@After
+	public void tearDown() throws Exception {
+		Iterator<PollsVote> iterator = _pollsVotes.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+	}
+
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
-		PollsVote newPollsVote = addPollsVote();
+	public void testCreate() throws Exception {
+		long pk = RandomTestUtil.nextLong();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(PollsVote.class,
-			getClass().getClassLoader());
+		PollsVote pollsVote = _persistence.create(pk);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("voteId",
-			newPollsVote.getVoteId()));
+		Assert.assertNotNull(pollsVote);
 
-		List<PollsVote> result = _persistence.findWithDynamicQuery(dynamicQuery);
-
-		Assert.assertEquals(1, result.size());
-
-		PollsVote existingPollsVote = result.get(0);
-
-		Assert.assertEquals(existingPollsVote, newPollsVote);
-
-		System.out.println();
-
-		Assert.assertTrue(false);
+		Assert.assertEquals(pollsVote.getPrimaryKey(), pk);
 	}
 
 	protected PollsVote addPollsVote() throws Exception {
@@ -100,9 +112,7 @@ public class PollsVotePersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(PollsVotePersistenceTest.class);
-
+	private List<PollsVote> _pollsVotes = new ArrayList<PollsVote>();
 	@Inject
 	private PollsVotePersistence _persistence;
-
-	private List<PollsVote> _pollsVotes = new ArrayList<PollsVote>();
 }
