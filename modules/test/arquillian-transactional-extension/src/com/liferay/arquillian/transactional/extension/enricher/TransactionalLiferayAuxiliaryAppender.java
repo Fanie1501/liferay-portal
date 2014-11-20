@@ -29,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.jar.Manifest;
 
+import com.liferay.arquillian.transactional.extension.activator.TransactionalBundleActivator;
+
 /**
  * @author Carlos Sierra Andrés
  */
@@ -55,6 +57,9 @@ public class TransactionalLiferayAuxiliaryAppender implements AuxiliaryArchiveAp
 			"com.liferay.portal.kernel.exception");
 
 		builder.addBundleManifestVersion(1);
+
+		builder.addBundleActivator(TransactionalBundleActivator.class);
+		archive.addClass(TransactionalBundleActivator.class);
 
 		Manifest manifest = builder.getManifest();
 
