@@ -19,19 +19,10 @@ import com.liferay.portal.util.DigesterImpl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.mockito.Mockito;
-
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Jorge Ferrer
  */
-@PrepareForTest(DigesterUtil.class)
-@RunWith(PowerMockRunner.class)
 public class MediaWikiToCreoleTranslatorTest {
 
 	@Test
@@ -305,19 +296,8 @@ public class MediaWikiToCreoleTranslatorTest {
 				"previous line\n{{{{\nmonospace\n''second'' line\n}}}}\nnext" +
 					" line";
 
-		PowerMockito.mockStatic(DigesterUtil.class);
-
-		Mockito.when(
-			DigesterUtil.getDigester()
-		).thenReturn(
-			new DigesterImpl()
-		);
-
-		Mockito.when(
-			DigesterUtil.digest(Mockito.anyString())
-		).thenReturn(
-			new DigesterImpl().digest(content)
-		);
+		DigesterUtil digesterUtil = new DigesterUtil();
+		digesterUtil.setDigester(new DigesterImpl());
 
 		String actual = _mediaWikiToCreoleTranslator.translate(content);
 
