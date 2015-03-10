@@ -47,6 +47,8 @@ public class WikiPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 	@Before
 	public void setUp() throws Exception {
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
+
+		super.setUp();
 	}
 
 	@Override

@@ -56,6 +56,8 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 	@Before
 	public void setUp() throws Exception {
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
+
+		super.setUp();
 	}
 
 	@Ignore()
