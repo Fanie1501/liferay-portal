@@ -24,13 +24,10 @@ import org.osgi.service.component.annotations.Component;
  * @author Cristina Rogdríguez
  */
 @Component(immediate = true, service = DatabaseConverter.class)
-public class TestCustomDatabaseConverter
-	implements DatabaseConverter {
+public class TestCustomDatabaseConverter implements DatabaseConverter {
 
 	public void convert(DataSource dataSource) throws Exception {
-
 		//Nothing to do here
-
 	}
 
 }

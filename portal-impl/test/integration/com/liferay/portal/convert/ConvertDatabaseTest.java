@@ -15,6 +15,7 @@
 package com.liferay.portal.convert;
 
 import com.liferay.portal.convert.bundle.customconvertdatabaseprocess.TestCustomDatabaseConverter;
+import com.liferay.portal.convert.database.PortalDatabaseConverter;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
@@ -51,14 +52,13 @@ public class ConvertDatabaseTest {
 	public void testGetCustomConvertDatabaseProcess() {
 		ConvertDatabase convertDatabase = _getConvertDatabase();
 
-		DatabaseConverter databaseConverter =
-			_getFirstConvertDataBaseProcess(
-				convertDatabase, TestCustomDatabaseConverter.class);
+		DatabaseConverter databaseConverter = _getFirstConvertDataBaseProcess(
+			convertDatabase, TestCustomDatabaseConverter.class);
 
 		Assert.assertNotNull(
 			"The TestCustomConvertDatabaseProcess has not being registered " +
 				"as a database converter",
-				databaseConverter);
+		databaseConverter);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class ConvertDatabaseTest {
 		Assert.assertNotNull(
 			"The PortalConvertDatabaseProcess has not being registered " +
 				"as a database converter",
-				portalDatabaseConverter);
+			portalDatabaseConverter);
 	}
 
 	private ConvertDatabase _getConvertDatabase() {

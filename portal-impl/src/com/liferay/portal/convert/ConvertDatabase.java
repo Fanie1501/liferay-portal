@@ -57,9 +57,7 @@ public class ConvertDatabase extends BaseConvertProcess {
 		Collection<DatabaseConverter> databaseConverters =
 			getConvertDatabaseProcesses();
 
-		for (DatabaseConverter databaseConverter :
-				databaseConverters) {
-
+		for (DatabaseConverter databaseConverter : databaseConverters) {
 			databaseConverter.convert(getDataSource());
 		}
 	}
