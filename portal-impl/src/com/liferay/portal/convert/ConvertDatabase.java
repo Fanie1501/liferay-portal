@@ -16,6 +16,8 @@ package com.liferay.portal.convert;
 
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.util.MaintenanceUtil;
+import com.liferay.portal.util.ShutdownUtil;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 
 import java.util.List;
@@ -58,9 +60,16 @@ public class ConvertDatabase extends BaseConvertProcess {
 
 	@Override
 	protected void doConvert() throws Exception {
+		MaintenanceUtil.appendStatus("Starting Database migration");
+
 		for (DatabaseConverter databaseConverter : _databaseConverters) {
 			databaseConverter.convert(getDataSource());
 		}
+
+		MaintenanceUtil.appendStatus(
+			"Please change your JDBC settings before restarting server");
+
+		ShutdownUtil.shutdown(0);
 	}
 
 	protected DataSource getDataSource() throws Exception {

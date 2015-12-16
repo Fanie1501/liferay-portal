@@ -154,11 +154,6 @@ public class PortalDatabaseConverter implements DatabaseConverter {
 		finally {
 			DataAccess.cleanUp(connection);
 		}
-
-		MaintenanceUtil.appendStatus(
-			"Please change your JDBC settings before restarting server");
-
-		ShutdownUtil.shutdown(0);
 	}
 
 	protected Class<?> getImplClass(String implClassName) throws Exception {
