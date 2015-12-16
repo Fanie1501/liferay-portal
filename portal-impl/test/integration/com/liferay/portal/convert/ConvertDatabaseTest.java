@@ -52,12 +52,12 @@ public class ConvertDatabaseTest {
 	}
 
 	@Test
-	public void testGetCustomConvertDatabaseProcess()
-		throws NoSuchFieldException, IllegalAccessException {
+	public void testGetCustomDatabaseConverter()
+		throws IllegalAccessException, NoSuchFieldException {
 
 		ConvertDatabase convertDatabase = _getConvertDatabase();
 
-		DatabaseConverter databaseConverter = _getFirstConvertDataBaseProcess(
+		DatabaseConverter databaseConverter = _getFirstDatabaseConverter(
 			convertDatabase, TestCustomDatabaseConverter.class);
 
 		Assert.assertNotNull(
@@ -67,14 +67,13 @@ public class ConvertDatabaseTest {
 	}
 
 	@Test
-	public void testGetPortalConvertDatabaseProcess()
+	public void testGetPortalDatabaseConverter()
 		throws IllegalAccessException, NoSuchFieldException {
 
 		ConvertDatabase convertDatabase = _getConvertDatabase();
 
-		DatabaseConverter portalDatabaseConverter =
-			_getFirstConvertDataBaseProcess(
-				convertDatabase, PortalDatabaseConverter.class);
+		DatabaseConverter portalDatabaseConverter = _getFirstDatabaseConverter(
+			convertDatabase, PortalDatabaseConverter.class);
 
 		Assert.assertNotNull(
 			"The PortalConvertDatabaseProcess has not being registered " +
@@ -95,7 +94,7 @@ public class ConvertDatabaseTest {
 		return null;
 	}
 
-	private DatabaseConverter _getFirstConvertDataBaseProcess(
+	private DatabaseConverter _getFirstDatabaseConverter(
 			ConvertDatabase convertDatabase, Class<?> convertDataProcessClass)
 		throws IllegalAccessException, NoSuchFieldException {
 
