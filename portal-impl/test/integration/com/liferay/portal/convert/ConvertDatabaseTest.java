@@ -21,7 +21,10 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.test.rule.SyntheticBundleRule;
 
+import java.lang.reflect.Field;
+
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -49,7 +52,9 @@ public class ConvertDatabaseTest {
 	}
 
 	@Test
-	public void testGetCustomConvertDatabaseProcess() {
+	public void testGetCustomConvertDatabaseProcess()
+		throws NoSuchFieldException, IllegalAccessException {
+
 		ConvertDatabase convertDatabase = _getConvertDatabase();
 
 		DatabaseConverter databaseConverter = _getFirstConvertDataBaseProcess(
@@ -62,7 +67,9 @@ public class ConvertDatabaseTest {
 	}
 
 	@Test
-	public void testGetPortalConvertDatabaseProcess() {
+	public void testGetPortalConvertDatabaseProcess()
+		throws IllegalAccessException, NoSuchFieldException {
+
 		ConvertDatabase convertDatabase = _getConvertDatabase();
 
 		DatabaseConverter portalDatabaseConverter =
@@ -89,11 +96,16 @@ public class ConvertDatabaseTest {
 	}
 
 	private DatabaseConverter _getFirstConvertDataBaseProcess(
-		ConvertDatabase convertDatabase, Class<?> convertDataProcessClass) {
+			ConvertDatabase convertDatabase, Class<?> convertDataProcessClass)
+		throws IllegalAccessException, NoSuchFieldException {
 
-		for (DatabaseConverter databaseConverter :
-				convertDatabase.getConvertDatabaseProcesses()) {
+		Field databaseConvertersField =
+			convertDatabase.getClass().getDeclaredField("_databaseConverters");
+		databaseConvertersField.setAccessible(true);
+		List<DatabaseConverter> databaseConverters =
+			(List)databaseConvertersField.get(convertDatabase);
 
+		for (DatabaseConverter databaseConverter :databaseConverters) {
 			if (databaseConverter.getClass().getName().equals(
 					convertDataProcessClass.getName())) {
 
