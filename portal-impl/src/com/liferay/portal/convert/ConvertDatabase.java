@@ -15,12 +15,10 @@
 package com.liferay.portal.convert;
 
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.collections.ServiceTrackerCollections;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -28,6 +26,12 @@ import javax.sql.DataSource;
  * @author Alexander Chow
  */
 public class ConvertDatabase extends BaseConvertProcess {
+
+	public void destroy() {
+		_databaseConverters.clear();
+
+		_databaseConverters = null;
+	}
 
 	@Override
 	public String getDescription() {
@@ -54,22 +58,8 @@ public class ConvertDatabase extends BaseConvertProcess {
 
 	@Override
 	protected void doConvert() throws Exception {
-		Collection<DatabaseConverter> databaseConverters =
-			getConvertDatabaseProcesses();
-
-		for (DatabaseConverter databaseConverter : databaseConverters) {
+		for (DatabaseConverter databaseConverter : _databaseConverters) {
 			databaseConverter.convert(getDataSource());
-		}
-	}
-
-	protected Collection<DatabaseConverter> getConvertDatabaseProcesses() {
-		try {
-			Registry registry = RegistryUtil.getRegistry();
-
-			return registry.getServices(DatabaseConverter.class, null);
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
 		}
 	}
 
@@ -85,5 +75,8 @@ public class ConvertDatabase extends BaseConvertProcess {
 		return DataSourceFactoryUtil.initDataSource(
 			driverClassName, url, userName, password, jndiName);
 	}
+
+	private List<DatabaseConverter> _databaseConverters =
+		ServiceTrackerCollections.openList(DatabaseConverter.class);
 
 }
