@@ -327,6 +327,8 @@ public class UpgradeImageGallery extends UpgradeProcess {
 		UpgradeDocumentLibrary upgradeDocumentLibrary =
 			new UpgradeDocumentLibrary();
 
+		upgradeDocumentLibrary.setConnection(connection);
+
 		upgradeDocumentLibrary.updateSyncs();
 	}
 

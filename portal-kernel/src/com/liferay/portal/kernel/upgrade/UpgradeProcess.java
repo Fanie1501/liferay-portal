@@ -72,6 +72,10 @@ public abstract class UpgradeProcess
 		return 0;
 	}
 
+	public void setConnection(Connection connection) {
+		this.connection = connection;
+	}
+
 	public void upgrade() throws UpgradeException {
 		long start = System.currentTimeMillis();
 
