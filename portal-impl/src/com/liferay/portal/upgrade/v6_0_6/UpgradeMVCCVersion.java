@@ -14,18 +14,23 @@
 
 package com.liferay.portal.upgrade.v6_0_6;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-
 /**
- * @author Brian Wing Shun Chan
+ * @author Cristina González
  */
-public class UpgradeSchema extends UpgradeProcess {
+public class UpgradeMVCCVersion
+	extends com.liferay.portal.upgrade.util.UpgradeMVCCVersion {
 
 	@Override
-	protected void doUpgrade() throws Exception {
-		runSQLTemplate("update-6.0.5-6.0.6.sql", false);
-
-		upgrade(UpgradeMVCCVersion.class);
+	protected String[] getExcludedTableNames() {
+		return new String[] {
+			"BackgroundTask", "ExportImportConfiguration", "LayoutBranch",
+			"LayoutFriendlyURL", "LayoutRevision", "LayoutSetBranch",
+			"PortalPreferences", "RecentLayoutBranch", "RecentLayoutRevision",
+			"RecentLayoutSetBranch", "Repository", "RepositoryEntry",
+			"ResourceBlock", "ResourceBlockPermission",
+			"ResourceTypePermission", "SystemEvent", "UserNotificationDelivery",
+			"UserNotificationEvent", "VirtualHost"
+		};
 	}
 
 }
