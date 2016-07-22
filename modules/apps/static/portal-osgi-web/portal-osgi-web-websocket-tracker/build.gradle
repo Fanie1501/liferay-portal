@@ -1,4 +1,31 @@
+task copyJettyDependencies(type: Copy)
+task deleteJettyDependencies(type: Delete)
+
+
+configurations {
+	jettyRuntime
+	jettyRuntime.transitive = false
+}
+
 dependencies {
+	jettyRuntime group: "javax.websocket", name: "javax.websocket-api", version: "1.0"
+	jettyRuntime group: "org.apache.aries", name: "org.apache.aries.util", version: "1.1.1"
+	jettyRuntime group: "org.apache.aries.spifly", name: "org.apache.aries.spifly.dynamic.bundle", version: "1.0.8"
+	jettyRuntime group: "org.eclipse.jetty", name: "jetty-http", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty", name: "jetty-io", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty", name: "jetty-security", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty", name: "jetty-server", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty", name: "jetty-servlet", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty", name: "jetty-util", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "javax-websocket-client-impl", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "javax-websocket-server-impl", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "websocket-api", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "websocket-client", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "websocket-common", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "websocket-server", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.eclipse.jetty.websocket", name: "websocket-servlet", version: "9.3.10.v20160621"
+	jettyRuntime group: "org.ow2.asm", name: "asm-all", version: "5.0.4"
+
 	provided group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
 	provided group: "com.liferay", name: "com.liferay.osgi.util", version: "3.0.0"
 	provided group: "com.liferay", name: "com.liferay.registry.api", version: "1.0.0"
@@ -6,4 +33,32 @@ dependencies {
 	provided group: "javax.websocket", name: "javax.websocket-api", version: "1.0"
 	provided group: "org.eclipse.jetty.websocket", name: "javax-websocket-server-impl", version: "9.3.10.v20160621"
 	provided group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
+}
+
+deploy {
+	dependsOn copyJettyDependencies
+}
+
+clean {
+	dependsOn deleteJettyDependencies
+}
+
+copyJettyDependencies {
+	def staticFolder = new File(liferay.liferayHome, "/osgi/static")
+
+	println "Copying jetty dependencies " + configurations.jettyRuntime +  " to " + staticFolder
+
+	from configurations.jettyRuntime
+	into new File(liferay.liferayHome, "/osgi/static")
+}
+
+
+deleteJettyDependencies {
+	configurations.jettyRuntime.each { file ->
+		def fileToDelete = new File(liferay.liferayHome, "/osgi/static/" + file.name)
+
+		println "Cleaning Jetty Dependency " + fileToDelete
+
+		delete fileToDelete
+	}
 }
