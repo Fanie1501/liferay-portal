@@ -33,8 +33,21 @@ import javax.websocket.server.ServerEndpointConfig;
 public class EndpointWrapper implements ServerEndpointConfig {
 
 	public EndpointWrapper(String path, Endpoint endpoint) {
-		_serverEndpointConfig =
-			Builder.create(endpoint.getClass(), path).build();
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader ctxLoader = currentThread.getContextClassLoader();
+
+		try {
+			currentThread.setContextClassLoader(
+				org.eclipse.jetty.websocket.jsr356.server.ServerContainer.
+					class.getClassLoader());
+
+			_serverEndpointConfig = Builder.create(
+				endpoint.getClass(), path).build();
+		}
+		finally {
+			currentThread.setContextClassLoader(ctxLoader);
+		}
 
 		_configurator = _serverEndpointConfig.getConfigurator();
 
