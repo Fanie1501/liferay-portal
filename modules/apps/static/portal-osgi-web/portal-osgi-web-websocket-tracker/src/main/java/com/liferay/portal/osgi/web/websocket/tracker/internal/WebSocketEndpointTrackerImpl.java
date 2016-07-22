@@ -15,8 +15,11 @@
 package com.liferay.portal.osgi.web.websocket.tracker.internal;
 
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.osgi.web.websocket.tracker.Constants;
 import com.liferay.portal.osgi.web.websocket.tracker.EndpointWrapper;
+import com.liferay.portal.osgi.web.websocket.tracker.JettyWebsocketServer;
 import com.liferay.portal.osgi.web.websocket.tracker.WebSocketEndpointTracker;
 
 import java.io.IOException;
@@ -26,9 +29,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.websocket.CloseReason;
+import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
+import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.osgi.framework.BundleContext;
@@ -36,6 +41,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -62,6 +68,21 @@ public class WebSocketEndpointTrackerImpl
 
 		EndpointWrapper endpointWrapper = new EndpointWrapper(
 			webSocketPath, endpoint);
+
+		ServerContainer serverContainer =
+			_jettyWebsocketServer.getServerContainer();
+
+		try {
+			serverContainer.addEndpoint(endpointWrapper);
+		}
+		catch (DeploymentException de) {
+			_log.error(
+				"Can't create the endpoint " + endpoint.getClass() +
+					" in the path " + webSocketPath,
+				de);
+
+			return null;
+		}
 
 		_webSocketEndpointRegistrations.put(webSocketPath, endpointWrapper);
 
@@ -107,6 +128,13 @@ public class WebSocketEndpointTrackerImpl
 		_bundleContext.ungetService(serviceReference);
 	}
 
+	@Reference(unbind = "-")
+	public void setJettyWebsocketServer(
+		JettyWebsocketServer jettyWebsocketServer) {
+
+		_jettyWebsocketServer = jettyWebsocketServer;
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		if (_webSocketEndpointServiceTracker != null) {
@@ -138,7 +166,11 @@ public class WebSocketEndpointTrackerImpl
 
 	};
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		WebSocketEndpointTrackerImpl.class);
+
 	private BundleContext _bundleContext;
+	private JettyWebsocketServer _jettyWebsocketServer;
 	private final ConcurrentMap<String, EndpointWrapper>
 		_webSocketEndpointRegistrations = new ConcurrentHashMap<>();
 	private ServiceTracker<Endpoint, EndpointWrapper>
